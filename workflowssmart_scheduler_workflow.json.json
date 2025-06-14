@@ -1,0 +1,205 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -200,
+        -60
+      ],
+      "id": "0630741a-b78c-495c-951c-17852b92fa0e",
+      "name": "When chat message received",
+      "webhookId": "b901ba06-bd45-4dbb-87e5-cc98159497fb"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=You are a helpful assistant. The Current date is {{ $now.format('yyyy-MM-dd') }}.\n--------------\nAs a Chatbot, your responsibilities Include:\nAnswering Questions: Provide information about AI agents, n8n workflows, and how theseautomation tools can benefit users.\nScheduling Agents: Assist users in booking meetings for personalised consultaions or support.\n\nIf a user wishes to book a meeting:\nCollect Information:\nAsk for their first name \nAsk for their Email address\nRequest their preferred date and time for the meeting\nConfirm Details:\n  Repeat the provided information, including the date and time of the meeting, to ensure accuracy.\nCOnversational Style: This is a chat conversation, so keep your responses short, like in a real chat.\nStay on topic: If someone tries to derail the conversation, politely steer them to normal flow."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        20,
+        -60
+      ],
+      "id": "4c8d2aa8-6b38-4b61-a733-b621573c460b",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-1.5-flash-latest",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        140
+      ],
+      "id": "d892c1ba-f20e-4bd2-950b-c5b6034a489c",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Yr7RYZN6S5jw0Ug2",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        60,
+        140
+      ],
+      "id": "e2ba7347-6bf9-4f4a-b1ac-b6724db42317",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": {
+          "__rl": true,
+          "value": "tannukaushik1503@gmail.com",
+          "mode": "list",
+          "cachedResultName": "tannukaushik1503@gmail.com"
+        },
+        "limit": 10,
+        "timeMin": "={{$fromAI(\"afterDate\")}}",
+        "timeMax": "={{$fromAI(\"beforeDate\")}}",
+        "options": {
+          "timeZone": {
+            "__rl": true,
+            "value": "Asia/Kolkata",
+            "mode": "list",
+            "cachedResultName": "Asia/Kolkata"
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        160,
+        160
+      ],
+      "id": "4dc2f089-6962-4435-974d-a8b2b88c45d7",
+      "name": "Google Calendar",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "pb9JkrfkXz1ia6gC",
+          "name": "Google Calendar account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "tannukaushik1503@gmail.com",
+          "mode": "list",
+          "cachedResultName": "tannukaushik1503@gmail.com"
+        },
+        "start": "={{$fromAI(\"startDate\")}}",
+        "end": "={{$fromAI(\"endDate\")}}",
+        "additionalFields": {
+          "attendees": [
+            "={{$fromAI(\"userEmailAddress\")}}",
+            "tannukaushik1503@gmail.com "
+          ],
+          "summary": "={{$fromAI(\"meetingSummary\")}}"
+        }
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        280,
+        160
+      ],
+      "id": "fa5f61c4-934f-45e7-8e98-20dcd8878214",
+      "name": "Google Calendar1",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "pb9JkrfkXz1ia6gC",
+          "name": "Google Calendar account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Calendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Calendar1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "3f807623-ec4c-4aea-b7af-bbb284bf5839",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2d5d36ae06c7292e329e9b72ffe15e823abb95b6971830fedd64b47a50c64148"
+  },
+  "id": "VWhhrzujqBHzCFlo",
+  "tags": []
+}
